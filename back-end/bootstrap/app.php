@@ -1,11 +1,9 @@
 <?php
 
-
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\VerifyCsrfToken;
-
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -16,6 +14,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
+            'admin' => \App\Http\Middleware\AdminMiddleware::class,
+        ]);
+       
+        $middleware->alias([
             'cors' => \Illuminate\Http\Middleware\HandleCors::class,
         ]);
        
@@ -24,15 +26,13 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Session\Middleware\StartSession::class,
         ]);
 
-
         $middleware->web(append: [
-            // tambahkan middleware yang ada di sini
         ]);
-
 
         $middleware->validateCsrfTokens(except: [
             'api/*'
         ]);
+
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

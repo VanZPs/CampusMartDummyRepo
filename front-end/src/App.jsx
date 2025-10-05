@@ -15,6 +15,12 @@ import CartPage from "./pages/CartPage";
 import OrderPage from "./pages/OrderPage";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import AdminRoute from './components/AdminRoute';
+import AdminLayout from './pages/admin/AdminLayout';
+import AdminDashboardPage from './pages/admin/AdminDashboardPage';
+import AdminProductsPage from './pages/admin/AdminProductsPage';
+import AdminOrdersPage from './pages/admin/AdminOrdersPage';
+import ProductForm from './components/admin/ProductForm';
 
 
 // 1. Membuat Context untuk Autentikasi
@@ -149,16 +155,27 @@ function App() {
           <Navbar />
           <main className="flex-grow">
             <Routes>
+              {/* Rute pengunjung biasa */}
               <Route path="/" element={<HomePage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/products" element={<ProductListPage />} />
 
-
-              {/* Rute yang dilindungi */}
+              {/* Rute yang aktif setelah login/register */}
               <Route element={<ProtectedRoute />}>
                 <Route path="/cart" element={<CartPage />} />
                 <Route path="/orders" element={<OrderPage />} />
+              </Route>
+
+              {/* Rute Khusus Admin */}
+              <Route path="/admin" element={<AdminRoute />}>
+                <Route element={<AdminLayout />}>
+                  <Route index element={<AdminDashboardPage />} />
+                  <Route path="products" element={<AdminProductsPage />} />
+                  <Route path="products/new" element={<ProductForm />} />
+                  <Route path="products/edit/:productId" element={<ProductForm />} />
+                  <Route path="orders" element={<AdminOrdersPage />} />
+                </Route>
               </Route>
             </Routes>
           </main>
@@ -180,6 +197,5 @@ function App() {
     </Router>
   );
 }
-
 
 export default App;
