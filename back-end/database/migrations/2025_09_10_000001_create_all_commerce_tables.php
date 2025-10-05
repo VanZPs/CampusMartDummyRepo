@@ -1,8 +1,10 @@
 <?php
 
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+
 
 return new class extends Migration
 {
@@ -21,11 +23,13 @@ return new class extends Migration
             $table->timestamps();
         });
 
+
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
             $table->timestamps();
         });
+
 
         // 2. Tabel yang bergantung pada tabel di atas
         Schema::create('products', function (Blueprint $table) {
@@ -39,20 +43,23 @@ return new class extends Migration
             $table->timestamps();
         });
 
+
         Schema::create('carts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
 
+
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->decimal('total', 12, 2);
-            $table->string('status')->default('pending');
+            $table->decimal('total', 10, 2);
+            $table->string('status');
             $table->text('address_text');
             $table->timestamps();
         });
+
 
         // 3. Tabel yang bergantung pada tabel di langkah 1 & 2
         Schema::create('cart_items', function (Blueprint $table) {
@@ -63,6 +70,7 @@ return new class extends Migration
             // timestamps tidak perlu karena item keranjang bersifat sementara
         });
 
+
         Schema::create('order_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
@@ -71,6 +79,7 @@ return new class extends Migration
             $table->integer('qty');
             $table->decimal('subtotal', 12, 2);
         });
+
 
         Schema::create('sessions', function (Blueprint $table) {
             $table->string('id')->primary();
@@ -81,6 +90,7 @@ return new class extends Migration
             $table->integer('last_activity')->index();
         });
     }
+
 
     /**
      * Reverse the migrations.
