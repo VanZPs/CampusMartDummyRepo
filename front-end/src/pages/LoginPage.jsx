@@ -55,7 +55,11 @@ const LoginPage = () => {
       login(data.user);
 
 
-      navigate('/');
+      if (data.user.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
 
 
     } catch (err) {
@@ -87,7 +91,6 @@ const LoginPage = () => {
             />
           </div>
          
-          {/* PERUBAHAN DI SINI */}
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700">
               Password
@@ -115,7 +118,6 @@ const LoginPage = () => {
               </button>
             </div>
           </div>
-          {/* AKHIR PERUBAHAN */}
 
 
           <button
