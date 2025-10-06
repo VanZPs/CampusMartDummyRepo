@@ -1,9 +1,18 @@
 <?php
 
+
+
+
 namespace App\Http\Controllers;
+
+
+
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+
+
+
 
 class ProductController extends Controller
 {
@@ -12,26 +21,26 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric',
             'stock' => 'required|integer',
             'category_id' => 'required|exists:categories,id',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:4096',
+            'is_active' => 'required|boolean',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $imageName = time().'.'.$request->image->extension();
 
-        $request->image->storeAs('public/products', $imageName);
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = time() . '_' . $image->getClientOriginalName();
+            $path = public_path('images/products');
+            $image->move($path, $imageName);
+            $validated['image'] = $imageName;
+        }
 
-        $product = Product::create([
-            'name' => $request->name,
-            'price' => $request->price,
-            'stock' => $request->stock,
-            'category_id' => $request->category_id,
-            'image' => $imageName,
-        ]);
 
+        $product = Product::create($validated);
         return response()->json($product, 201);
     }
 
@@ -53,9 +62,11 @@ class ProductController extends Controller
     {
         $query = $request->input('q');
 
+
         if (empty($query)) {
             return $this->recommendations();
         }
+
 
         $products = Product::where('is_active', true)
                             ->where('name', 'LIKE', "%{$query}%")
@@ -100,25 +111,34 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric',
             'stock' => 'required|integer',
             'category_id' => 'required|exists:categories,id',
             'is_active' => 'required|boolean',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $product->fill($request->except('image'));
 
         if ($request->hasFile('image')) {
-            $imageName = time().'.'.$request->image->extension();
-            $request->image->move(public_path('images/products'), $imageName);
-            $product->image = $imageName;
+            if ($product->image) {
+                $oldImagePath = public_path('images/products/' . $product->image);
+                if (File::exists($oldImagePath)) {
+                    File::delete($oldImagePath);
+                }
+            }
+
+
+            $image = $request->file('image');
+            $imageName = time() . '_' . $image->getClientOriginalName();
+            $path = public_path('images/products');
+            $image->move($path, $imageName);
+            $validated['image'] = $imageName;
         }
 
-        $product->save();
 
+        $product->update($validated);
         return response()->json($product);
     }
 
@@ -128,7 +148,13 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
+        if ($product->image) {
+            $imagePath = public_path('images/products/' . $product->image);
+            if (File::exists($imagePath)) {
+                File::delete($imagePath);
+            }
+        }
         $product->delete();
-        return response()->json(['message' => 'Produk berhasil dihapus.']);
+        return response()->json(['message' => 'Produk berhasil dihapus']);
     }
 }
