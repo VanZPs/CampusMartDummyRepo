@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuth } from '../App';
+import ProductImage from '../components/ProductImage';
 
 
 // Komponen untuk Loading & Error
@@ -79,6 +80,7 @@ const CartPage = () => {
   // Hapus item dari keranjang
   const handleDeleteItem = async (itemId) => {
     if (!window.confirm("Apakah Anda yakin ingin menghapus item ini?")) return;
+   
     try {
       const res = await fetch(`http://localhost:8000/api/cart/items/${itemId}`, {
         method: 'DELETE',
@@ -100,6 +102,8 @@ const CartPage = () => {
         newSelected.delete(itemId);
         return newSelected;
       });
+
+
       toast.success('Item berhasil dihapus.');
       updateCartCount();
     } catch (err) {
@@ -156,7 +160,7 @@ const CartPage = () => {
       updateCartCount();
       setCheckoutModalOpen(false);
       setSelectedItems(new Set());
-      await fetchCart(); // refresh keranjang
+      await fetchCart();
       navigate('/orders');
     } catch (err) {
       toast.error(err.message);
@@ -200,13 +204,18 @@ const CartPage = () => {
                     checked={selectedItems.has(item.id)}
                     onChange={() => handleSelectItem(item.id)}
                   />
-                  <img src={`http://localhost:8000/images/products/${item.product.image}`} alt={item.product.name} className="w-20 h-20 object-cover rounded-md" />
+                  <ProductImage product={item.product} className="w-20 h-20 object-cover rounded-md" />
                   <div className="flex-grow mx-4">
                     <p className="font-semibold text-lg text-gray-800">{item.product.name}</p>
                     <p className="text-gray-600 font-bold">Rp {Number(item.product.price).toLocaleString('id-ID')}</p>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <button onClick={() => handleUpdateQuantity(item.id, item.qty - 1)} className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300">-</button>
+                    <button
+                      onClick={() => handleUpdateQuantity(item.id, item.qty - 1)}
+                      className="px-3 py-1 bg-gray-200 rounded hover:bg-red-500 hover:text-white transition-colors duration-200"
+                    >
+                      -
+                    </button>
                     <input
                       type="number"
                       value={item.qty}
@@ -216,7 +225,12 @@ const CartPage = () => {
                       }}
                       className="w-12 text-center border rounded"
                     />
-                    <button onClick={() => handleUpdateQuantity(item.id, item.qty + 1)} className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300">+</button>
+                    <button
+                      onClick={() => handleUpdateQuantity(item.id, item.qty + 1)}
+                      className="px-3 py-1 bg-gray-200 rounded hover:bg-green-500 hover:text-white transition-colors duration-200"
+                    >
+                      +
+                    </button>
                   </div>
                   <div className="text-right ml-4 flex-shrink-0 w-32">
                     <p className="text-gray-500 text-sm">Subtotal</p>

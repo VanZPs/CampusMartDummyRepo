@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import ProductImage from '../../components/ProductImage';
 
 
 const AdminProductsPage = () => {
@@ -55,10 +56,10 @@ const AdminProductsPage = () => {
         <div className="container mx-auto px-4 sm:px-8">
             <div className="py-8">
                 <div className="flex flex-row justify-between w-full mb-1 sm:mb-0">
-                    <h2 className="text-2xl leading-tight">
+                    <h2 className="text-3xl font-bold leading-tight">
                         Kelola Produk
                     </h2>
-                    <Link to="/admin/products/add" className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                    <Link to="/admin/products/new" className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
                         + Tambah Produk
                     </Link>
                 </div>
@@ -92,9 +93,10 @@ const AdminProductsPage = () => {
                                 {filteredProducts.map(product => (
                                     <tr key={product.id}>
                                         <td className="px-5 py-5 border-b text-sm">
-                                            <div className="flex-shrink-0 w-16 h-16">
-                                                <img className="w-full h-full rounded-md object-cover" src={`http://localhost:8000/images/products/${product.image}`} alt={product.name} />
-                                            </div>
+                                            <ProductImage
+                                                product={product}
+                                                className="w-16 h-16 rounded-md"
+                                            />
                                         </td>
                                         <td className="px-5 py-5 border-b text-sm">{product.name}</td>
                                         <td className="px-5 py-5 border-b text-sm">Rp {Number(product.price).toLocaleString('id-ID')}</td>

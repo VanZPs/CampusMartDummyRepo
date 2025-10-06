@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useNavigate } from 'react';
+import React, { useState, useEffect } from 'react';
+import ProductImage from '../components/ProductImage';
 
 
 // Komponen Pembantu
@@ -10,7 +11,6 @@ const OrderPage = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
 
 
   // Fungsi untuk mengambil riwayat pesanan
@@ -73,20 +73,20 @@ const OrderPage = () => {
           <div className="space-y-6">
             {orders.map(order => (
               <div key={order.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-                <div className="p-6 bg-gray-50 border-b flex justify-between items-center flex-wrap gap-4">
+                <div className="p-6 bg-gray-50 border-b flex justify-between items-center">
                   <div>
                     <h2 className="text-lg font-bold text-gray-800">
                       Pesanan #{order.id}
                     </h2>
                     <p className="text-sm text-gray-500">
-                      Tanggal: {order.created_at ? new Date(order.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'}
+                      Tanggal: {new Date(order.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}
                     </p>
                   </div>
                   <div className="text-right">
-                   <span className={`px-3 py-1 text-sm font-semibold rounded-full ${getStatusClass(order.status)}`}>
-                      {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                    </span>
-                    <p className="font-bold text-lg text-gray-800 mt-1">Rp {Number(order.total).toLocaleString('id-ID')}</p>
+                     <span className={`px-3 py-1 text-sm font-semibold rounded-full ${getStatusClass(order.status)}`}>
+                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                      </span>
+                     <p className="font-bold text-lg text-gray-800 mt-1">Rp {Number(order.total).toLocaleString('id-ID')}</p>
                   </div>
                 </div>
 
@@ -101,12 +101,12 @@ const OrderPage = () => {
                   <div className="space-y-4">
                     {order.items.map(item => (
                       <div key={item.id} className="flex items-center">
-                        <img src={`http://localhost:8000/images/products/${item.product.image}`} alt={item.product.name} className="w-16 h-16 object-cover rounded-md" />
+                        <ProductImage product={item.product} className="w-16 h-16 object-cover rounded-md" />
                         <div className="flex-grow mx-4">
                           <p className="font-semibold text-gray-800">{item.product.name}</p>
                           <p className="text-sm text-gray-500">{item.qty} x Rp {Number(item.price).toLocaleString('id-ID')}</p>
                         </div>
-                        <p className="font-semibold text-gray-700">Rp {Number(item.subtotal).toLocaleString('id-ID')}</p>
+                        <p className="font-semibold text-gray-700">Rp {Number(item.qty * item.price).toLocaleString('id-ID')}</p>
                       </div>
                     ))}
                   </div>

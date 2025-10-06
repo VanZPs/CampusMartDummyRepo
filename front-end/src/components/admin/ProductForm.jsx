@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import ProductImage from '../ProductImage';
 
 
 const MAX_IMAGE_MB = 2;
@@ -265,9 +266,9 @@ const ProductForm = () => {
                     <label className="block text-sm font-medium text-gray-700">Gambar Produk</label>
                     <div className="mt-2 flex items-center space-x-6">
                         {imagePreview ? (
-                            <img src={imagePreview} alt="Preview" className="w-32 h-32 object-cover rounded-md bg-gray-100" />
+                            <img src={imagePreview} alt="Preview" className="w-32 h-32 object-cover rounded-md bg-gray-100"/>
                         ) : (
-                            <div className="w-32 h-32 bg-gray-100 rounded-md flex items-center justify-center text-gray-400">Tanpa Gambar</div>
+                            <ProductImage product={product} className="w-32 h-32 rounded-md"/>
                         )}
                         <div className="flex flex-col">
                             <input ref={fileInputRef} type="file" name="image" accept={ALLOWED_TYPES.join(',')} onChange={handleImageChange} className="hidden" />
