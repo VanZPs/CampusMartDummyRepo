@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 
-
 // Komponen untuk menampilkan loading spinner
 const LoadingSpinner = () => (
   <div className="flex justify-center items-center h-64">
@@ -22,7 +21,6 @@ const ErrorMessage = ({ message }) => (
   </div>
 );
 
-
 // Komponen untuk menampilkan pesan "Tidak Ditemukan"
 const NotFoundMessage = () => (
   <div className="text-center py-10 px-6 bg-gray-100 rounded-lg">
@@ -31,16 +29,14 @@ const NotFoundMessage = () => (
   </div>
 );
 
-
 const ProductListPage = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryTitle, setCategoryTitle] = useState('');
- 
-  const location = useLocation();
 
+  const location = useLocation();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -48,7 +44,6 @@ const ProductListPage = () => {
       setError(null);
       setSearchQuery('');
       setCategoryTitle('');
-
 
       const params = new URLSearchParams(location.search);
       const query = params.get('q');
@@ -65,7 +60,6 @@ const ProductListPage = () => {
         return;
       }
 
-
       try {
         const response = await fetch(url);
         if (!response.ok) {
@@ -74,18 +68,18 @@ const ProductListPage = () => {
         const data = await response.json();
         setProducts(data);
 
-
-        // Jika ini halaman kategori, cari nama kategorinya
-        if (categoryId && data.length > 0) {
-            setCategoryTitle(data[0].category.name);
-        }
+        if (categoryId) {
+                setProducts(data.products);
+                setCategoryTitle(data.category.name);
+            } else {
+                setProducts(data);
+            }
       } catch (err) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-
 
     fetchProducts();
   }, [location.search]);
@@ -109,11 +103,9 @@ const ProductListPage = () => {
     return <h1 className="text-3xl font-bold mb-8 text-gray-800">Daftar Produk</h1>;
   };
 
-
   return (
     <div className="container mx-auto p-4 md:p-8">
       {renderTitle()}
-
 
       {loading && <LoadingSpinner />}
       {error && <ErrorMessage message={error} />}
@@ -132,6 +124,5 @@ const ProductListPage = () => {
     </div>
   );
 };
-
 
 export default ProductListPage;
