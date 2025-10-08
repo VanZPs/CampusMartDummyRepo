@@ -21,6 +21,7 @@ import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AdminProductsPage from './pages/admin/AdminProductsPage';
 import AdminOrdersPage from './pages/admin/AdminOrdersPage';
 import ProductForm from './components/admin/ProductForm';
+import ProductDetailPage from './pages/ProductDetailPage';
 
 
 // 1. Membuat Context untuk Autentikasi
@@ -160,12 +161,15 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/products" element={<ProductListPage />} />
+              <Route path="/product/:productId" element={<ProductDetailPage />} />
+
 
               {/* Rute yang aktif setelah login/register */}
               <Route element={<ProtectedRoute />}>
                 <Route path="/cart" element={<CartPage />} />
                 <Route path="/orders" element={<OrderPage />} />
               </Route>
+
 
               {/* Rute Khusus Admin */}
               <Route path="/admin" element={<AdminRoute />}>
@@ -197,5 +201,6 @@ function App() {
     </Router>
   );
 }
+
 
 export default App;
