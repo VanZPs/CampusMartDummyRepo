@@ -6,13 +6,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Cart;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Throwable; // <-- Tambahkan ini
-
-
+use Throwable;
+use Illuminate\Validation\ValidationException;
 
 
 class OrderController extends Controller
@@ -32,7 +32,6 @@ class OrderController extends Controller
         $user = Auth::user();
         $cart = Cart::where('user_id', $user->id)->firstOrFail();
        
-        // Ambil item yang akan di-checkout DARI DALAM cart milik user
         $itemsToCheckout = $cart->items()->whereIn('id', $request->item_ids)->with('product')->get();
 
 
@@ -46,7 +45,6 @@ class OrderController extends Controller
                 $total = 0;
 
 
-                // Validasi stok dan hitung total
                 foreach ($itemsToCheckout as $item) {
                     $product = $item->product;
                     if ($item->qty > $product->stock) {
@@ -56,16 +54,14 @@ class OrderController extends Controller
                 }
 
 
-                // 1. Buat record pesanan (Order)
                 $newOrder = Order::create([
                     'user_id' => $user->id,
                     'total' => $total,
-                    'status' => 'diproses', // Status awal
+                    'status' => 'diproses',
                     'address_text' => $request->address_text,
                 ]);
 
 
-                // 2. Pindahkan item dari keranjang ke item pesanan (OrderItem)
                 foreach ($itemsToCheckout as $item) {
                     $newOrder->items()->create([
                         'product_id' => $item->product_id,
@@ -73,14 +69,10 @@ class OrderController extends Controller
                         'qty' => $item->qty,
                         'subtotal' => $item->product->price * $item->qty,
                     ]);
-
-
-                    // 3. Kurangi stok produk
                     $item->product->decrement('stock', $item->qty);
                 }
 
 
-                // 4. Hapus item yang sudah di-checkout dari keranjang
                 $cart->items()->whereIn('id', $request->item_ids)->delete();
 
 
@@ -104,11 +96,77 @@ class OrderController extends Controller
     {
         $user = Auth::user();
         $orders = Order::with('items.product')
-                       ->where('user_id', $user->id)
-                       ->latest()
-                       ->get();
+                        ->where('user_id', $user->id)
+                        ->latest()
+                        ->get();
 
 
         return response()->json($orders);
+    }
+
+
+    /**
+     * CheckOut Direct
+     */
+    public function checkoutDirect(Request $request)
+    {
+        $validated = $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'quantity' => 'required|integer|min:1',
+            'address_text' => 'required|string|max:1000',
+        ]);
+
+
+        $product = Product::findOrFail($validated['product_id']);
+        $quantity = $validated['quantity'];
+        $totalPrice = $product->price * $quantity;
+
+
+        try {
+            DB::beginTransaction();
+
+
+            if ($product->stock < $quantity) {
+                throw ValidationException::withMessages([
+                    'quantity' => 'Stok produk tidak mencukupi. Sisa stok: ' . $product->stock,
+                ]);
+            }
+
+
+
+
+            $order = Order::create([
+                'user_id' => $request->user()->id,
+                'total' => $totalPrice, 
+                'status' => 'diproses', 
+                'address_text' => $validated['address_text'], 
+            ]);
+
+
+ 
+            $order->items()->create([
+                'product_id' => $product->id,
+                'price' => $product->price,
+                'qty' => $quantity, 
+                'subtotal' => $totalPrice,
+            ]);
+
+
+            $product->decrement('stock', $quantity);
+
+
+            DB::commit();
+
+
+            return response()->json($order->load('items.product'), 201);
+
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            if ($e instanceof ValidationException) {
+                return response()->json(['message' => $e->getMessage(), 'errors' => $e->errors()], 422);
+            }
+            return response()->json(['message' => 'Terjadi kesalahan saat memproses pesanan.', 'error' => $e->getMessage()], 500);
+        }
     }
 }
