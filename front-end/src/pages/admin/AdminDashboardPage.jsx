@@ -146,103 +146,109 @@ const AdminDashboardPage = () => {
     const welcomeText = `Selamat Datang, ${user ? user.name : 'Admin'}!`;
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Kolom Kiri: Header & Statistik */}
-            <div className="lg:col-span-2 space-y-8">
-                {/* Header */}
-                <div
-                    className="relative text-left p-8 bg-gray-800 rounded-xl overflow-hidden text-white"
-                    style={{ backgroundImage: `url(${HeaderBackground})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
-                >
-                    <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40"></div>
-                    <div className="relative z-10 flex justify-between items-start">
-                        <div>
-                            <h1 className="text-3xl font-extrabold mb-2">
-                                <span className="animate-wave" aria-label={welcomeText}>
-                                    {welcomeText.split("").map((char, index) => (
-                                        <span key={index} style={{ animationDelay: `${index * 50}ms` }}>
-                                        {char === " " ? "\u00A0" : char}
-                                        </span>
-                                    ))}
-                                </span>
-                            </h1>
-                            <p className="text-lg text-gray-300 animate-pulse-zoom-yellow">
-                                Pilih menu di samping untuk mulai mengelola toko.
-                            </p>
-                        </div>
-                        <button
-                            onClick={handleRefresh}
-                            className="p-3 bg-white/10 rounded-full hover:bg-white/20 transition-all duration-300 text-white flex-shrink-0"
-                            title="Refresh Data"
-                        >
-                            <svg className={`w-6 h-6 ${loading ? 'animate-spin' : ''}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h5M20 20v-5h-5M20 4h-5v5M4 20h5v-5m11-1a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                        </button>
+        <div className="space-y-8">
+            {/* Header */}
+            <div
+                className="relative text-left p-8 bg-gray-800 rounded-xl overflow-hidden text-white"
+                style={{ backgroundImage: `url(${HeaderBackground})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+            >
+                <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40"></div>
+                <div className="relative z-10 flex justify-between items-center">
+                    <div>
+                        <h1 className="text-3xl font-extrabold mb-2">
+                            <span className="animate-wave" aria-label={welcomeText}>
+                                {welcomeText.split("").map((char, index) => (
+                                    <span key={index} style={{ animationDelay: `${index * 50}ms` }}>
+                                    {char === " " ? "\u00A0" : char}
+                                    </span>
+                                ))}
+                            </span>
+                        </h1>
+                        <p className="text-lg text-gray-300 animate-pulse-zoom-yellow">
+                            Pilih menu di samping untuk mulai mengelola toko.
+                        </p>
                     </div>
-                </div>
-
-                {/* Container Statistik */}
-                <div className="bg-white p-6 rounded-xl shadow-sm">
-                    <h2 className="text-xl font-bold mb-4 border-b pb-3">Ringkasan Statistik</h2>
-                     {loading ? (
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                            <SkeletonStatCard />
-                            <SkeletonStatCard />
-                            <SkeletonStatCard />
-                        </div>
-                    ) : (
-                        <>
-                           {/* Statistik Produk */}
-                            <div>
-                                <h3 className="font-semibold text-gray-700 mb-3">Produk</h3>
-                                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                    <StatCard title="Total Produk" value={stats?.products.total} icon="📦" colorClass="bg-blue-50 text-blue-800" iconBgClass="bg-blue-500" />
-                                    <StatCard title="Produk Aktif" value={stats?.products.active} icon="✅" colorClass="bg-green-50 text-green-800" iconBgClass="bg-green-500" />
-                                    <StatCard title="Tidak Aktif" value={stats?.products.inactive} icon="❌" colorClass="bg-red-50 text-red-800" iconBgClass="bg-red-500" />
-                                </div>
-                            </div>
-
-                            {/* Statistik Pesanan */}
-                            <div className="mt-8">
-                                <h3 className="font-semibold text-gray-700 mb-3">Pesanan</h3>
-                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                                    <StatCard title="Total" value={stats?.orders.total} icon="🛒" colorClass="bg-indigo-50 text-indigo-800" iconBgClass="bg-indigo-500" />
-                                    <StatCard title="Diproses" value={stats?.orders.processed} icon="⏳" colorClass="bg-yellow-50 text-yellow-800" iconBgClass="bg-yellow-500" />
-                                    <StatCard title="Dikirim" value={stats?.orders.shipped} icon="🚚" colorClass="bg-cyan-50 text-cyan-800" iconBgClass="bg-cyan-500" />
-                                    <StatCard title="Selesai" value={stats?.orders.completed} icon="🎉" colorClass="bg-emerald-50 text-emerald-800" iconBgClass="bg-emerald-500" />
-                                    <StatCard title="Batal" value={stats?.orders.cancelled} icon="🗑️" colorClass="bg-rose-50 text-rose-800" iconBgClass="bg-rose-500" />
-                                </div>
-                            </div>
-                        </>
-                    )}
+                    <button
+                        onClick={handleRefresh}
+                        className="p-3 bg-white/10 rounded-full hover:bg-white/20 transition-all duration-300 text-white flex-shrink-0"
+                        title="Refresh Data"
+                    >
+                        <svg 
+                            className={`w-6 h-6 transition-transform duration-500 ease-out ${loading ? 'animate-spin-reverse' : 'group-hover:-rotate-180'}`} 
+                            xmlns="http://www.w3.org/2000/svg" 
+                            viewBox="0 0 24 24" 
+                            fill="currentColor"
+                        >
+                            <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6s-2.69 6-6 6s-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8s-3.58-8-8-8z" />
+                        </svg>
+                    </button>
                 </div>
             </div>
 
-            {/* Kolom Kanan: Aktivitas Terbaru */}
-            <div className="lg:col-span-1">
-                <div className="bg-white p-6 rounded-xl shadow-sm h-full">
-                    <h2 className="text-xl font-bold mb-4 border-b pb-3">Aktivitas Terbaru</h2>
-                    {!activityLog ? (
-                         <SkeletonActivity />
-                    ) : activityLog && activityLog.data.length > 0 ? (
-                        <>
-                            <div className="mt-4">
-                                {activityLog.data.map((order, index) => (
-                                    <ActivityLogItem
-                                        key={order.id}
-                                        order={order}
-                                        isLast={index === activityLog.data.length - 1}
-                                    />
-                                ))}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Kolom Kiri: Statistik */}
+                <div className="lg:col-span-2">
+                    <div className="bg-white p-6 rounded-xl shadow-sm h-full">
+                        <h2 className="text-xl font-bold mb-4 border-b pb-3">Ringkasan Statistik</h2>
+                        {loading ? (
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                                <SkeletonStatCard />
+                                <SkeletonStatCard />
+                                <SkeletonStatCard />
                             </div>
-                            <PaginationControls pagination={activityLog} onPageChange={handlePageChange} />
-                        </>
-                    ) : (
-                        <p className="text-gray-500 text-sm mt-4 text-center py-8">
-                           Belum ada aktivitas terbaru.
-                        </p>
-                    )}
+                        ) : (
+                            <>
+                                {/* Statistik Produk */}
+                                <div>
+                                    <h3 className="font-semibold text-gray-700 mb-3">Produk</h3>
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                        <StatCard title="Total Produk" value={stats?.products.total} icon="📦" colorClass="bg-blue-50 text-blue-800" iconBgClass="bg-blue-500" />
+                                        <StatCard title="Produk Aktif" value={stats?.products.active} icon="✅" colorClass="bg-green-50 text-green-800" iconBgClass="bg-green-500" />
+                                        <StatCard title="Tidak Aktif" value={stats?.products.inactive} icon="❌" colorClass="bg-red-50 text-red-800" iconBgClass="bg-red-500" />
+                                    </div>
+                                </div>
+
+                                {/* Statistik Pesanan */}
+                                <div className="mt-8">
+                                    <h3 className="font-semibold text-gray-700 mb-3">Pesanan</h3>
+                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                                        <StatCard title="Total" value={stats?.orders.total} icon="🛒" colorClass="bg-indigo-50 text-indigo-800" iconBgClass="bg-indigo-500" />
+                                        <StatCard title="Diproses" value={stats?.orders.processed} icon="⏳" colorClass="bg-yellow-50 text-yellow-800" iconBgClass="bg-yellow-500" />
+                                        <StatCard title="Dikirim" value={stats?.orders.shipped} icon="🚚" colorClass="bg-cyan-50 text-cyan-800" iconBgClass="bg-cyan-500" />
+                                        <StatCard title="Selesai" value={stats?.orders.completed} icon="🎉" colorClass="bg-emerald-50 text-emerald-800" iconBgClass="bg-emerald-500" />
+                                        <StatCard title="Batal" value={stats?.orders.cancelled} icon="🗑️" colorClass="bg-rose-50 text-rose-800" iconBgClass="bg-rose-500" />
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </div>
+
+                {/* Kolom Kanan: Aktivitas Terbaru */}
+                <div className="lg:col-span-1">
+                    <div className="bg-white p-6 rounded-xl shadow-sm h-full">
+                        <h2 className="text-xl font-bold mb-4 border-b pb-3">Aktivitas Terbaru</h2>
+                        {!activityLog ? (
+                            <SkeletonActivity />
+                        ) : activityLog && activityLog.data.length > 0 ? (
+                            <>
+                                <div className="mt-4">
+                                    {activityLog.data.map((order, index) => (
+                                        <ActivityLogItem
+                                            key={order.id}
+                                            order={order}
+                                            isLast={index === activityLog.data.length - 1}
+                                        />
+                                    ))}
+                                </div>
+                                <PaginationControls pagination={activityLog} onPageChange={handlePageChange} />
+                            </>
+                        ) : (
+                            <p className="text-gray-500 text-sm mt-4 text-center py-8">
+                                Belum ada aktivitas terbaru.
+                            </p>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

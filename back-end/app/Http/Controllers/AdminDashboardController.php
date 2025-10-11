@@ -33,7 +33,7 @@ class AdminDashboardController extends Controller
 
         $recentOrders = Order::with(['user', 'items.product'])
                             ->latest() 
-                            ->paginate(10); 
+                            ->paginate(3); 
 
         return response()->json([
             'statistics' => [
