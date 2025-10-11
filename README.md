@@ -33,7 +33,7 @@ Proyek ini terdiri dari dua bagian utama: `back-end` dan `front-end`. Ikuti lang
 
 Clone repository ini ke device anda:
 ```bash
-git clone [https://github.com/julius-tegar-aji-putra/pbpkel9.git](https://github.com/julius-tegar-aji-putra/pbpkel9.git)
+git clone https://github.com/julius-tegar-aji-putra/pbpkel9.git
 ```
 
 Masuk ke folder proyek 
