@@ -15,6 +15,7 @@ const CartPage = () => {
   const [selectedItems, setSelectedItems] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
 
 
   // State untuk Modal Checkout
@@ -28,7 +29,7 @@ const CartPage = () => {
 
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
-
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Muat data keranjang dari API (/api/cart)
   const fetchCart = async () => {
@@ -85,8 +86,8 @@ const CartPage = () => {
   };
 
   const confirmDeleteItem = async () => {
-    if (!itemToDelete) return;
-
+    if (!itemToDelete || isDeleting) return;
+    setIsDeleting(true);
     try {
       const res = await fetch(`http://localhost:8000/api/cart/items/${itemToDelete}`, {
         method: 'DELETE',
@@ -115,6 +116,7 @@ const CartPage = () => {
       // Tutup modal setelah selesai
       setDeleteModalOpen(false);
       setItemToDelete(null);
+      setIsDeleting(false);
     }
   };
   

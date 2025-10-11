@@ -3,7 +3,9 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../../App';
 import HeaderBackground from '../../assets/header-background.svg';
 
+
 // --- Komponen-komponen Baru untuk Tampilan (Telah Ditingkatkan) ---
+
 
 const StatCard = ({ title, value, icon, colorClass, iconBgClass }) => (
     <div className={`relative p-4 rounded-xl shadow flex items-center transition-transform duration-300 hover:scale-105 ${colorClass}`}>
@@ -16,6 +18,7 @@ const StatCard = ({ title, value, icon, colorClass, iconBgClass }) => (
         </div>
     </div>
 );
+
 
 const ActivityLogItem = ({ order, isLast }) => (
     <div className="relative pl-8">
@@ -41,8 +44,10 @@ const ActivityLogItem = ({ order, isLast }) => (
     </div>
 );
 
+
 const PaginationControls = ({ pagination, onPageChange }) => {
     if (!pagination || pagination.total <= pagination.per_page) return null;
+
 
     return (
         <div className="mt-4 flex justify-between items-center text-sm">
@@ -69,7 +74,9 @@ const PaginationControls = ({ pagination, onPageChange }) => {
     );
 };
 
+
 // --- Komponen Skeleton untuk Loading State ---
+
 
 const SkeletonStatCard = () => (
     <div className="p-4 rounded-xl shadow bg-gray-200 animate-pulse">
@@ -82,6 +89,7 @@ const SkeletonStatCard = () => (
         </div>
     </div>
 );
+
 
 const SkeletonActivity = () => (
      <div className="space-y-6">
@@ -98,13 +106,17 @@ const SkeletonActivity = () => (
 );
 
 
+
+
 // --- Komponen Utama Halaman Dashboard ---
+
 
 const AdminDashboardPage = () => {
     const { user } = useAuth();
     const [stats, setStats] = useState(null);
     const [activityLog, setActivityLog] = useState(null);
     const [loading, setLoading] = useState(true);
+
 
     const fetchData = useCallback(async (page = 1) => {
         // Hanya set loading untuk call pertama atau saat refresh, bukan saat ganti halaman
@@ -128,14 +140,17 @@ const AdminDashboardPage = () => {
         }
     }, []);
 
+
     useEffect(() => {
         fetchData();
     }, [fetchData]);
+
 
     const handleRefresh = () => {
         toast.success('Memuat ulang data...');
         fetchData(1); // Kembali ke halaman 1 saat refresh
     };
+
 
     const handlePageChange = (newPage) => {
         // Set activityLog jadi null agar pagination hilang saat data baru diambil
@@ -143,7 +158,9 @@ const AdminDashboardPage = () => {
         fetchData(newPage);
     };
 
+
     const welcomeText = `Selamat Datang, ${user ? user.name : 'Admin'}!`;
+
 
     return (
         <div className="space-y-8">
@@ -173,10 +190,10 @@ const AdminDashboardPage = () => {
                         className="p-3 bg-white/10 rounded-full hover:bg-white/20 transition-all duration-300 text-white flex-shrink-0"
                         title="Refresh Data"
                     >
-                        <svg 
-                            className={`w-6 h-6 transition-transform duration-500 ease-out ${loading ? 'animate-spin-reverse' : 'group-hover:-rotate-180'}`} 
-                            xmlns="http://www.w3.org/2000/svg" 
-                            viewBox="0 0 24 24" 
+                        <svg
+                            className={`w-6 h-6 transition-transform duration-500 ease-out ${loading ? 'animate-spin-reverse' : 'group-hover:-rotate-180'}`}
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
                             fill="currentColor"
                         >
                             <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6s-2.69 6-6 6s-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8s-3.58-8-8-8z" />
@@ -184,6 +201,7 @@ const AdminDashboardPage = () => {
                     </button>
                 </div>
             </div>
+
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Kolom Kiri: Statistik */}
@@ -203,10 +221,31 @@ const AdminDashboardPage = () => {
                                     <h3 className="font-semibold text-gray-700 mb-3">Produk</h3>
                                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                         <StatCard title="Total Produk" value={stats?.products.total} icon="📦" colorClass="bg-blue-50 text-blue-800" iconBgClass="bg-blue-500" />
-                                        <StatCard title="Produk Aktif" value={stats?.products.active} icon="✅" colorClass="bg-green-50 text-green-800" iconBgClass="bg-green-500" />
-                                        <StatCard title="Tidak Aktif" value={stats?.products.inactive} icon="❌" colorClass="bg-red-50 text-red-800" iconBgClass="bg-red-500" />
+                                        <StatCard
+                                            title="Produk Aktif"
+                                            value={stats?.products.active}
+                                            icon={
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            }
+                                            colorClass="bg-green-50 text-green-800"
+                                            iconBgClass="bg-green-500"
+                                        />
+                                        <StatCard
+                                            title="Tidak Aktif"
+                                            value={stats?.products.inactive}
+                                            icon={
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            }
+                                            colorClass="bg-red-50 text-red-800"
+                                            iconBgClass="bg-red-500"
+                                        />
                                     </div>
                                 </div>
+
 
                                 {/* Statistik Pesanan */}
                                 <div className="mt-8">
@@ -223,6 +262,7 @@ const AdminDashboardPage = () => {
                         )}
                     </div>
                 </div>
+
 
                 {/* Kolom Kanan: Aktivitas Terbaru */}
                 <div className="lg:col-span-1">
@@ -254,5 +294,6 @@ const AdminDashboardPage = () => {
         </div>
     );
 };
+
 
 export default AdminDashboardPage;
