@@ -125,3 +125,15 @@
   display: inline-block;
   animation: pulse-zoom-yellow 4s ease-in-out infinite;
 }
+
+/* Sembunyikan panah spinner di input number untuk Chrome, Safari, Edge, Opera */
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+
+/* Sembunyikan panah spinner di input number untuk Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}

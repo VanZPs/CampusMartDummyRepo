@@ -144,44 +144,72 @@ const ProductDetailPage = () => {
 
     return (
         <>
-            <div className="container mx-auto p-4 md:p-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="w-full h-auto aspect-square">
-                        <ProductImage product={product} className="rounded-lg shadow-lg" />
-                    </div>
-                    <div>
-                        <h1 className="text-3xl md:text-4xl font-bold mb-2">{product.name}</h1>
-                        <p className="text-2xl text-blue-600 font-semibold mb-4">
-                            Rp {parseInt(product.price).toLocaleString('id-ID')}
-                        </p>
-                        <div className="prose max-w-none mb-6">
-                            <p>{product.description}</p>
-                        </div>
-                        <p className="text-sm text-gray-600 mb-4">Stok tersisa: {product.stock}</p>
-                        
-                        <div className="flex items-center gap-4 mb-6">
-                            <label htmlFor="quantity" className="font-semibold">Jumlah:</label>
-                            <div className="flex items-center border rounded-md">
-                                <button onClick={() => adjustQuantity(-1)} className="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-l-md transition">-</button>
-                                <input 
-                                    type="number"
-                                    id="quantity"
-                                    value={quantity}
-                                    onChange={handleQuantityChange}
-                                    className="w-16 text-center border-y-0"
-                                    min="1"
-                                    max={product.stock}
+            <div className="bg-gray-50 min-h-screen">
+                <div className="container mx-auto px-4 py-8">
+                    <div className="bg-white p-6 rounded-2xl shadow-xl flex flex-col md:flex-row gap-12">
+                        {/* Kolom Gambar (Kiri) */}
+                        <div className="md:w-1/2 flex justify-center items-center">
+                            <div className="w-full max-w-md bg-gray-100 rounded-xl p-4">
+                                <ProductImage 
+                                    product={product} 
+                                    className="w-full h-auto object-contain aspect-square" 
                                 />
-                                <button onClick={() => adjustQuantity(1)} className="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-r-md transition">+</button>
                             </div>
                         </div>
-                        <div className="flex flex-col sm:flex-row gap-4">
-                            <button onClick={handleAddToCart} className="w-full bg-blue-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-600 transition duration-300">
-                                Tambah ke Keranjang
-                            </button>
-                             <button onClick={handleCheckout} className="w-full bg-green-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-600 transition duration-300">
-                                Checkout Langsung
-                            </button>
+
+                        {/* Kolom Detail (Kanan) */}
+                        <div className="md:w-1/2 flex flex-col justify-center">
+                            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-3">
+                                {product.name}
+                            </h1>
+                            <p className="text-3xl text-blue-600 font-bold mb-5">
+                                Rp {parseInt(product.price).toLocaleString('id-ID')}
+                            </p>
+                            <div className="prose max-w-none mb-6 text-gray-600">
+                                <p>{product.description}</p>
+                            </div>
+                            <p className="text-md text-gray-700 mb-6 font-medium">
+                                Stok tersisa: <span className="text-black font-bold">{product.stock}</span>
+                            </p>
+                            
+                            <div className="flex items-center gap-4 mb-6">
+                                <label htmlFor="quantity" className="font-semibold text-lg">Jumlah:</label>
+                                <div className="flex items-stretch border border-gray-400 rounded-lg overflow-hidden">
+                                    <button 
+                                        onClick={() => adjustQuantity(-1)} 
+                                        className="px-3 py-1 bg-gray-200 text-gray-800 transition-colors hover:bg-red-500 hover:text-white disabled:opacity-50"
+                                        disabled={quantity <= 1 || (product && product.stock === 0)}
+                                    >
+                                        -
+                                    </button>
+                                    <input 
+                                        type="number"
+                                        id="quantity"
+                                        value={quantity}
+                                        onChange={handleQuantityChange}
+                                        className="w-16 text-center bg-gray-100 text-gray-900 border-x border-gray-400 focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                                        min="1"
+                                        max={product.stock}
+                                        disabled={product && product.stock === 0}
+                                    />
+                                    <button 
+                                        onClick={() => adjustQuantity(1)} 
+                                        className="px-3 py-1 bg-gray-200 text-gray-800 transition-colors hover:bg-green-500 hover:text-white disabled:opacity-50"
+                                        disabled={product && quantity >= product.stock}
+                                    >
+                                        +
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row gap-4 mt-2">
+                                <button onClick={handleAddToCart} className="w-full bg-blue-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-600 transition duration-300 disabled:bg-gray-400" disabled={product.stock === 0}>
+                                    Tambah ke Keranjang
+                                </button>
+                                <button onClick={handleCheckout} className="w-full bg-green-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-600 transition duration-300 disabled:bg-gray-400" disabled={product.stock === 0}>
+                                    Checkout Langsung
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

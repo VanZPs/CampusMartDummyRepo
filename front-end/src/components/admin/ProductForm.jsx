@@ -222,87 +222,155 @@ const ProductForm = () => {
                 };
         }
     };
+
+    const QuantityInput = ({ value, onChange }) => {
+        const handleAdjust = (amount) => {
+            const newValue = Math.max(0, parseInt(value || 0, 10) + amount);
+            onChange({ target: { name: 'stock', value: newValue } });
+        };
+
+        return (
+            <div className="flex items-stretch border border-gray-300 rounded-md overflow-hidden w-32">
+                <button 
+                    type="button"
+                    onClick={() => handleAdjust(-1)} 
+                    className="px-3 py-1 bg-gray-200 text-gray-800 transition-colors hover:bg-red-500 hover:text-white disabled:opacity-50"
+                    disabled={value <= 0}
+                >
+                    -
+                </button>
+                <input 
+                    type="number"
+                    name="stock"
+                    value={value}
+                    onChange={onChange}
+                    className="w-full text-center font-semibold bg-gray-50 text-gray-900 border-x border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                    min="0"
+                />
+                <button 
+                    type="button"
+                    onClick={() => handleAdjust(1)} 
+                    className="px-3 py-1 bg-gray-200 text-gray-800 transition-colors hover:bg-green-500 hover:text-white"
+                >
+                    +
+                </button>
+            </div>
+        );
+    };
+
     const statusConfig = getStatusConfig();
    
     if (loading) return <div>Loading form...</div>;
 
-
     return (
-        <div className="bg-white p-8 rounded-lg shadow-md">
-            <h1 className="text-2xl font-bold mb-6">{isEditing ? 'Edit Produk' : 'Tambah Produk Baru'}</h1>
-            <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Nama Produk</label>
-                    <input type="text" name="name" value={product.name} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Harga</label>
-                    <input type="number" name="price" value={product.price} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Stok</label>
-                    <input type="number" name="stock" value={product.stock} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Kategori</label>
-                    <select name="category_id" value={product.category_id} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
-                        <option value="">Pilih Kategori</option>
-                        {categories.map(cat => (<option key={cat.id} value={cat.id}>{cat.name}</option>))}
-                        <option value="__CREATE_NEW__" className="font-bold text-blue-600">-- Tambah Kategori Baru --</option>
-                    </select>
+        <div className="bg-white p-8 rounded-2xl shadow-xl max-w-6xl mx-auto">
+            <h1 className="text-3xl font-bold mb-8 text-gray-800 border-b pb-4">{isEditing ? 'Edit Produk' : 'Tambah Produk Baru'}</h1>
+            <form onSubmit={handleSubmit} className="space-y-8">
+
+                {/* Baris 1: Nama Produk & Kategori */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Nama Produk</label>
+                        <input 
+                            type="text" 
+                            id="name"
+                            name="name" 
+                            value={product.name} 
+                            onChange={handleChange} 
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                            required 
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="category_id" className="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
+                        <select 
+                            id="category_id"
+                            name="category_id" 
+                            value={product.category_id} 
+                            onChange={handleChange} 
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                            required
+                        >
+                            <option value="">Pilih Kategori</option>
+                            {categories.map(cat => (<option key={cat.id} value={cat.id}>{cat.name}</option>))}
+                            <option value="__CREATE_NEW__" className="font-bold text-blue-600">-- Tambah Kategori Baru --</option>
+                        </select>
+                    </div>
                 </div>
                 {showNewCategoryInput && (
-                    <div className="p-4 bg-gray-50 rounded-md border border-gray-200">
+                    <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
                         <label className="block text-sm font-medium text-gray-700">Nama Kategori Baru</label>
                         <div className="flex items-center space-x-2 mt-1">
-                            <input type="text" value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} placeholder="Contoh: Makanan Ringan" className="block w-full rounded-md border-gray-300 shadow-sm" />
-                            <button type="button" onClick={handleSaveNewCategory} className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 whitespace-nowrap">Simpan Kategori</button>
+                            <input type="text" value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} placeholder="Contoh: Makanan Ringan" className="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                            <button type="button" onClick={handleSaveNewCategory} className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 whitespace-nowrap">Simpan</button>
                         </div>
                     </div>
                 )}
 
-
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Gambar Produk</label>
-                    <div className="mt-2 flex items-center space-x-6">
-                        {imagePreview ? (
-                            <img src={imagePreview} alt="Preview" className="w-32 h-32 object-cover rounded-md bg-gray-100"/>
-                        ) : (
-                            <ProductImage product={product} className="w-32 h-32 rounded-md"/>
-                        )}
-                        <div className="flex flex-col">
-                            <input ref={fileInputRef} type="file" name="image" accept={ALLOWED_TYPES.join(',')} onChange={handleImageChange} className="hidden" />
-                            <button type="button" onClick={() => fileInputRef.current?.click()} className="px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
-                                {isEditing ? 'Ubah Gambar' : 'Pilih Gambar'}
-                            </button>
-                            <p className="text-xs text-gray-500 mt-1">PNG, JPG, GIF (MAX. {MAX_IMAGE_MB}MB)</p>
-                        </div>
+                {/* Baris 2: Harga & Stok */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                    <div>
+                        <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">Harga (Rp)</label>
+                        <input 
+                            type="number" 
+                            id="price"
+                            name="price" 
+                            value={product.price} 
+                            onChange={handleChange} 
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                            required 
+                            min="0"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Stok</label>
+                        <QuantityInput value={product.stock} onChange={handleChange} />
                     </div>
                 </div>
 
-
-                <div className="flex flex-col space-y-4">
-                    <label className="block text-sm font-medium text-gray-700">Status Produk <span className="text-red-500">*</span></label>
-                    <div className="relative">
-                        <div className={`w-24 h-10 rounded-full transition-all duration-500 ease-in-out ${statusConfig.bgColor} shadow-lg`}>
-                            <div className={`absolute top-1 left-1 w-8 h-8 bg-white rounded-full shadow-md transform transition-transform duration-500 ease-in-out ${statusConfig.indicatorPosition} flex items-center justify-center`}>
-                                <span className="text-sm font-bold text-gray-700">{statusConfig.icon}</span>
+                {/* Baris 3: Gambar & Status */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Gambar Produk</label>
+                        <div className="mt-2 flex items-center space-x-6">
+                            {imagePreview ? (
+                                <img src={imagePreview} alt="Preview" className="w-24 h-24 object-cover rounded-lg bg-gray-100 shadow-md"/>
+                            ) : (
+                                <div className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                </div>
+                            )}
+                            <div>
+                                <input ref={fileInputRef} type="file" name="image" accept={ALLOWED_TYPES.join(',')} onChange={handleImageChange} className="hidden" />
+                                <button type="button" onClick={() => fileInputRef.current?.click()} className="px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                    {imagePreview ? 'Ubah Gambar' : 'Pilih Gambar'}
+                                </button>
+                                <p className="text-xs text-gray-500 mt-1">PNG, JPG, GIF (MAX. {MAX_IMAGE_MB}MB)</p>
                             </div>
                         </div>
-                        <button type="button" onClick={() => handleStatusSelect(false)} className="absolute left-0 top-0 w-7 h-10 opacity-0 cursor-pointer" aria-label="Nonaktif" />
-                        <button type="button" onClick={() => handleStatusSelect(null)} className="absolute left-7 top-0 w-8 h-10 opacity-0 cursor-pointer" aria-label="Belum dipilih" />
-                        <button type="button" onClick={() => handleStatusSelect(true)} className="absolute left-16 top-0 w-7 h-10 opacity-0 cursor-pointer" aria-label="Aktif" />
                     </div>
-                    <div className="flex items-center space-x-2">
-                        <div className={`w-3 h-3 rounded-full transition-colors duration-300 ${product.is_active === true ? 'bg-green-500' : product.is_active === false ? 'bg-red-500' : 'bg-gray-400'}`} />
-                        <span className={`text-sm font-medium transition-colors duration-300 ${statusConfig.textColor}`}>{statusConfig.label}</span>
+                    <div className="flex flex-col space-y-2">
+                        <label className="block text-sm font-medium text-gray-700">Status Produk <span className="text-red-500">*</span></label>
+                        <div className="relative">
+                            <div className={`w-24 h-10 rounded-full transition-all duration-500 ease-in-out ${statusConfig.bgColor} shadow-inner`}>
+                                <div className={`absolute top-1 left-1 w-8 h-8 bg-white rounded-full shadow-md transform transition-transform duration-500 ease-in-out ${statusConfig.indicatorPosition} flex items-center justify-center`}>
+                                    <span className="text-sm font-bold text-gray-700">{statusConfig.icon}</span>
+                                </div>
+                            </div>
+                            <button type="button" onClick={() => handleStatusSelect(false)} className="absolute left-0 top-0 w-7 h-10 opacity-0 cursor-pointer" aria-label="Nonaktif" />
+                            <button type="button" onClick={() => handleStatusSelect(null)} className="absolute left-7 top-0 w-8 h-10 opacity-0 cursor-pointer" aria-label="Belum dipilih" />
+                            <button type="button" onClick={() => handleStatusSelect(true)} className="absolute left-16 top-0 w-7 h-10 opacity-0 cursor-pointer" aria-label="Aktif" />
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <div className={`w-3 h-3 rounded-full transition-colors duration-300 ${product.is_active === true ? 'bg-green-500' : product.is_active === false ? 'bg-red-500' : 'bg-gray-400'}`} />
+                            <span className={`text-sm font-medium transition-colors duration-300 ${statusConfig.textColor}`}>{statusConfig.label}</span>
+                        </div>
                     </div>
-                    <p className="text-xs text-gray-500">Pilih status produk. Wajib dipilih.</p>
                 </div>
-               
-                <div className="flex justify-end space-x-4">
-                    <button type="button" onClick={() => navigate('/admin/products')} className="px-6 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Batal</button>
-                    <button type="submit" className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Simpan</button>
+                
+                <div className="border-t pt-6 flex justify-end space-x-4">
+                    <button type="button" onClick={() => navigate('/admin/products')} className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">Batal</button>
+                    <button type="submit" className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">Simpan</button>
                 </div>
             </form>
         </div>
