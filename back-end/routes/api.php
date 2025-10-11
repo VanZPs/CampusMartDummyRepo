@@ -1,8 +1,6 @@
 <?php
 
 
-
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -12,13 +10,12 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\AdminOrderController;
 use App\Models\Product;
+use App\Http\Controllers\AdminDashboardController;
 
 
 // Rute Otentikasi
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-
-
 
 
 // Rute yang memerlukan otentikasi
@@ -46,8 +43,6 @@ Route::middleware('auth:web')->group(function () {
 });
 
 
-
-
 // Rute Produk untuk Pengguna
 Route::get('/products', function () {
     $products = Product::where('is_active', true)->get();
@@ -73,9 +68,12 @@ Route::get('/products/{product}', [ProductController::class, 'show']);
 Route::get('/categories/random', [CategoryController::class, 'getRandomCategories']);
 // 2. Menampilkan produk berdasarkan ID kategori
 Route::get('/categories/{category}/products', [CategoryController::class, 'showProductsByCategory']);
-  
+ 
 // RUTE KHUSUS ADMIN
 Route::middleware(['auth:web', 'admin'])->prefix('admin')->group(function () {
+    // Dashboard Management
+    Route::get('/dashboard', [AdminDashboardController::class, 'index']);
+   
     // Product Management
     Route::get('/products', function () {
         return response()->json(Product::all());

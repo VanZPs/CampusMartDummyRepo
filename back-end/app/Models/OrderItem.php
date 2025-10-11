@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 
 class OrderItem extends Model
@@ -13,29 +14,24 @@ class OrderItem extends Model
     use HasFactory;
 
 
-
-
-    /**
-     * Memberitahu Laravel untuk tidak mengelola kolom created_at dan updated_at.
-     */
     public $timestamps = false;
-
-
     protected $fillable = ['order_id', 'product_id', 'price', 'qty', 'subtotal'];
 
 
-    public function order()
+    /**
+     * Mendefinisikan relasi ke Product.
+     */
+    public function product(): BelongsTo
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(Product::class);
     }
 
 
     /**
-     * Mendefinisikan relasi "belongs-to".
-     * Satu item pesanan (OrderItem) adalah milik satu produk (Product).
+     * Mendefinisikan relasi ke Order.
      */
-    public function product()
+    public function order(): BelongsTo
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Order::class);
     }
 }
