@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use App\Models\Category;
+use Illuminate\Support\Facades\File;
 
 class ProductController extends Controller
 {
@@ -122,19 +124,32 @@ class ProductController extends Controller
         return response()->json($product);
     }
 
-
     /**
      * Hapus produk dari katalog
      */
     public function destroy(Product $product)
     {
+        $categoryId = $product->category_id;
+
+        $product->cartItems()->delete();
+
         if ($product->image) {
             $imagePath = public_path('images/products/' . $product->image);
             if (File::exists($imagePath)) {
                 File::delete($imagePath);
             }
         }
+
         $product->delete();
+
+        $remainingProducts = Product::where('category_id', $categoryId)->count();
+        if ($remainingProducts === 0) {
+            $category = Category::find($categoryId);
+            if ($category) {
+                $category->delete();
+            }
+        }
+
         return response()->json(['message' => 'Produk berhasil dihapus']);
     }
 

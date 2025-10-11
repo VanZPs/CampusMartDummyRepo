@@ -74,7 +74,7 @@ return new class extends Migration
         Schema::create('order_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
-            $table->foreignId('product_id')->constrained('products'); // Tidak cascade agar riwayat produk tidak hilang jika produk dihapus
+            $table->foreignId('product_id')->nullable()->constrained('products')->onDelete('set null');
             $table->decimal('price', 10, 2); // Harga saat dibeli
             $table->integer('qty');
             $table->decimal('subtotal', 12, 2);

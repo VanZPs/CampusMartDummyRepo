@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import ProductImage from '../../components/ProductImage';
-
+import ConfirmationModal from '../../components/ConfirmationModal';
 
 const AdminProductsPage = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
-
+    const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [productToDelete, setProductToDelete] = useState(null);
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -29,18 +30,31 @@ const AdminProductsPage = () => {
     }, []);
 
 
-    const handleDelete = async (id) => {
-        if (!window.confirm('Apakah Anda yakin ingin menghapus produk ini?')) return;
+    const handleDelete = (id) => {
+        setProductToDelete(id); 
+        setDeleteModalOpen(true); 
+    };
+
+    const confirmDelete = async () => {
+        if (!productToDelete) return; 
         try {
-            const res = await fetch(`http://localhost:8000/api/admin/products/${id}`, {
+            const res = await fetch(`http://localhost:8000/api/admin/products/${productToDelete}`, {
                 method: 'DELETE',
                 credentials: 'include',
             });
-            if (!res.ok) throw new Error('Gagal menghapus produk.');
-            setProducts(products.filter(p => p.id !== id));
+            
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.message || 'Gagal menghapus produk.');
+            }
+
+            setProducts(products.filter(p => p.id !== productToDelete));
             toast.success('Produk berhasil dihapus!');
         } catch (error) {
             toast.error(error.message);
+        } finally {
+            setDeleteModalOpen(false);
+            setProductToDelete(null);
         }
     };
    
@@ -119,6 +133,15 @@ const AdminProductsPage = () => {
                     </div>
                 </div>
             </div>
+            <ConfirmationModal
+                isOpen={isDeleteModalOpen}
+                message="Apakah Anda yakin ingin menghapus produk ini secara permanen?"
+                onConfirm={confirmDelete}
+                onCancel={() => {
+                    setDeleteModalOpen(false);
+                    setProductToDelete(null);
+                }}
+            />
         </div>
     );
 };

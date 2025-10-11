@@ -3,15 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuth } from '../App';
 import ProductImage from '../components/ProductImage';
+import ConfirmationModal from '../components/ConfirmationModal';
 
 
 // Komponen untuk Loading & Error
 const LoadingSpinner = () => <div className="text-center py-10"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div></div>;
 const ErrorMessage = ({ message }) => <div className="text-center py-10 px-6 bg-red-100 text-red-700 rounded-lg"><p>{message}</p></div>;
 
-
 const CartPage = () => {
-  const [cart, setCart] = useState(null); // Menyimpan objek cart lengkap
+  const [cart, setCart] = useState(null); 
   const [selectedItems, setSelectedItems] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -25,6 +25,9 @@ const CartPage = () => {
 
   const navigate = useNavigate();
   const { updateCartCount } = useAuth();
+
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
 
 
   // Muat data keranjang dari API (/api/cart)
@@ -76,13 +79,16 @@ const CartPage = () => {
     }
   };
 
+  const handleDeleteItem = (itemId) => {
+    setItemToDelete(itemId);
+    setDeleteModalOpen(true);
+  };
 
-  // Hapus item dari keranjang
-  const handleDeleteItem = async (itemId) => {
-    if (!window.confirm("Apakah Anda yakin ingin menghapus item ini?")) return;
-   
+  const confirmDeleteItem = async () => {
+    if (!itemToDelete) return;
+
     try {
-      const res = await fetch(`http://localhost:8000/api/cart/items/${itemId}`, {
+      const res = await fetch(`http://localhost:8000/api/cart/items/${itemToDelete}`, {
         method: 'DELETE',
         credentials: 'include',
         headers: { 'Accept': 'application/json' },
@@ -90,28 +96,28 @@ const CartPage = () => {
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data?.message || 'Gagal menghapus item.');
 
-
       setCart(currentCart => currentCart ? {
         ...currentCart,
-        items: currentCart.items.filter(item => item.id !== itemId)
+        items: currentCart.items.filter(item => item.id !== itemToDelete)
       } : currentCart);
-
 
       setSelectedItems(currentSelected => {
         const newSelected = new Set(currentSelected);
-        newSelected.delete(itemId);
+        newSelected.delete(itemToDelete);
         return newSelected;
       });
-
 
       toast.success('Item berhasil dihapus.');
       updateCartCount();
     } catch (err) {
       toast.error(err.message);
+    } finally {
+      // Tutup modal setelah selesai
+      setDeleteModalOpen(false);
+      setItemToDelete(null);
     }
   };
-
-
+  
   // Pilih / batal pilih item
   const handleSelectItem = (itemId) => {
     setSelectedItems(currentSelected => {
@@ -169,19 +175,16 @@ const CartPage = () => {
     }
   };
 
-
   if (loading) return <LoadingSpinner />;
   if (error) return <div className="container mx-auto p-8"><ErrorMessage message={error} /></div>;
 
-
   const cartItems = cart?.items || [];
-
 
   return (
     <div className="bg-gray-100 min-h-screen">
       <div className="container mx-auto p-4 md:p-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-6">Keranjang Belanja</h1>
-       
+        
         {cartItems.length === 0 ? (
           <div className="text-center py-10 px-6 bg-white rounded-lg shadow-md">
             <h2 className="text-xl font-semibold text-gray-700">Keranjang Anda kosong</h2>
@@ -243,7 +246,6 @@ const CartPage = () => {
               ))}
             </div>
 
-
             <div className="lg:col-span-1">
               <div className="bg-white p-6 rounded-lg shadow-md sticky top-28">
                 <h2 className="text-xl font-bold border-b pb-4 mb-4">Ringkasan Belanja</h2>
@@ -263,8 +265,15 @@ const CartPage = () => {
           </div>
         )}
       </div>
-
-
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        message="Apakah Anda yakin ingin menghapus item ini?"
+        onConfirm={confirmDeleteItem}
+        onCancel={() => {
+          setDeleteModalOpen(false);
+          setItemToDelete(null);
+        }}
+      />
       {isCheckoutModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
