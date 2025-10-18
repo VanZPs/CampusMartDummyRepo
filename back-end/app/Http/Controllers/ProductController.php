@@ -157,8 +157,9 @@ class ProductController extends Controller
     /**
      * Detail produk
      */
-    public function show(Product $product)
+    public function show($id)
     {
+        $product = Product::with('category')->findOrFail($id);
         return response()->json($product);
     }
 }

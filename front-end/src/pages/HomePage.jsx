@@ -171,7 +171,7 @@ const HomePage = () => {
       {/* Hero Section */}
       <div
         ref={heroRef}
-        className={`relative text-center py-20 md:py-30 bg-gray-100 rounded-lg mb-6 bg-cover bg-center fade-in-section ${isHeroVisible ? 'is-visible' : ''}`}
+        className={`relative z-10 text-center py-20 md:py-30 bg-gray-100 rounded-lg mb-6 bg-cover bg-center fade-in-section ${isHeroVisible ? 'is-visible' : ''}`}
         style={{ backgroundImage: `url(${HeaderBackground})` }}
       >
         <div className="absolute inset-0 bg-black opacity-50 rounded-lg"></div>
@@ -226,7 +226,7 @@ const HomePage = () => {
             </form>
            
             {isSearchFocused && (
-              <div className="absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-xl text-left">
+              <div className="absolute z-20 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-xl text-left">
                 {suggestions.length > 0 ? (
                   suggestions.map(item => (
                     <Link

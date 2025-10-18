@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import ProductImage from '../components/ProductImage';
 import { useAuth } from '../App';
@@ -38,27 +38,50 @@ const ProductDetailPage = () => {
     }, [productId]);
 
     const handleQuantityChange = (e) => {
-        let newQuantity = parseInt(e.target.value, 10);
-        if (isNaN(newQuantity) || newQuantity < 1) {
-            newQuantity = 1;
-        } else if (product && newQuantity > product.stock) {
-            newQuantity = product.stock;
+        const value = e.target.value;
+        if (value === '' || /^[0-9]\d*$/.test(value)) {
+            const numValue = value === '' ? '' : parseInt(value, 10);
+
+            if (product && numValue > product.stock) {
+                toast.error(`Stok tidak cukup! Maksimal pembelian ${product.stock}.`);
+                setQuantity(product.stock);
+            } else {
+                setQuantity(numValue);
+            }
         }
-        setQuantity(newQuantity);
+    };
+
+    const handleQuantityBlur = () => {
+        if (quantity === '' || quantity < 1) {
+            if (quantity === 0) {
+                 toast.error("Jumlah minimal adalah 1.");
+            }
+            setQuantity(1);
+        }
     };
 
     const adjustQuantity = (amount) => {
-        setQuantity(prev => {
-            const newQuantity = prev + amount;
-            if (newQuantity < 1) return 1;
-            if (product && newQuantity > product.stock) return product.stock;
-            return newQuantity;
-        });
+        const currentQuantity = Number(quantity) || 0;
+        let newQuantity = currentQuantity + amount;
+        
+        if (newQuantity < 1) {
+            newQuantity = 1;
+        }
+        if (product && newQuantity > product.stock) {
+            newQuantity = product.stock;
+            toast.error(`Stok tidak cukup! Maksimal pembelian ${product.stock}.`);
+        }
+        setQuantity(newQuantity);
     };
 
     const handleAddToCart = async () => {
         if (!user) {
             navigate('/login');
+            return;
+        }
+        if (quantity < 1 || quantity === '') {
+            toast.error("Jumlah tidak valid.");
+            setQuantity(1);
             return;
         }
 
@@ -86,9 +109,7 @@ const ProductDetailPage = () => {
                 throw new Error(errorData.message || 'Gagal menambahkan produk.');
             }
             
-            toast.success(`${product.name} berhasil ditambahkan!`, {
-                position: 'top-right',
-            });
+            toast.success(`${product.name} berhasil ditambahkan!`);
             await updateCartCount(); 
 
         } catch (error) {
@@ -108,6 +129,11 @@ const ProductDetailPage = () => {
     const handleConfirmDirectCheckout = async () => {
         if (addressText.trim() === '') {
             toast.error("Alamat pengiriman tidak boleh kosong.");
+            return;
+        }
+        if (quantity < 1 || quantity === '') {
+            toast.error("Jumlah tidak valid.");
+            setQuantity(1);
             return;
         }
 
@@ -147,7 +173,6 @@ const ProductDetailPage = () => {
             <div className="bg-gray-50 min-h-screen">
                 <div className="container mx-auto px-4 py-8">
                     <div className="bg-white p-6 rounded-2xl shadow-xl flex flex-col md:flex-row gap-12">
-                        {/* Kolom Gambar (Kiri) */}
                         <div className="md:w-1/2 flex justify-center items-center">
                             <div className="w-full max-w-md bg-gray-100 rounded-xl p-4">
                                 <ProductImage 
@@ -157,18 +182,24 @@ const ProductDetailPage = () => {
                             </div>
                         </div>
 
-                        {/* Kolom Detail (Kanan) */}
                         <div className="md:w-1/2 flex flex-col justify-center">
                             <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-3">
                                 {product.name}
                             </h1>
-                            <p className="text-3xl text-blue-600 font-bold mb-5">
+                            <p className="text-3xl text-blue-600 font-bold mb-2">
                                 Rp {parseInt(product.price).toLocaleString('id-ID')}
                             </p>
-                            <div className="prose max-w-none mb-6 text-gray-600">
-                                <p>{product.description}</p>
-                            </div>
-                            <p className="text-md text-gray-700 mb-6 font-medium">
+                            {product.category && (
+                                <div className="mb-4">
+                                    <Link 
+                                        to={`/products?category=${product.category.id}`} 
+                                        className="inline-block bg-gray-200 rounded-full px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-blue-500 hover:text-white transition-all duration-300"
+                                    >
+                                        {product.category.name}
+                                    </Link>
+                                </div>
+                            )}
+                            <p className="text-md text-gray-700 mb-2 font-medium">
                                 Stok tersisa: <span className="text-black font-bold">{product.stock}</span>
                             </p>
                             
@@ -183,13 +214,12 @@ const ProductDetailPage = () => {
                                         -
                                     </button>
                                     <input 
-                                        type="number"
+                                        type="text"
                                         id="quantity"
                                         value={quantity}
                                         onChange={handleQuantityChange}
-                                        className="w-16 text-center bg-gray-100 text-gray-900 border-x border-gray-400 focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                                        min="1"
-                                        max={product.stock}
+                                        onBlur={handleQuantityBlur}
+                                        className="w-16 text-center bg-gray-100 text-gray-900 border-x border-gray-400 focus:outline-none"
                                         disabled={product && product.stock === 0}
                                     />
                                     <button 

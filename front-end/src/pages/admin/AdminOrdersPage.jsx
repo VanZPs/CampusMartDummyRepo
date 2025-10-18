@@ -78,16 +78,23 @@ const AdminOrdersPage = () => {
                             <td className="px-5 py-5 border-b text-sm">{order.user.name}</td>
                             <td className="px-5 py-5 border-b text-sm">Rp {Number(order.total).toLocaleString('id-ID')}</td>
                             <td className="px-5 py-5 border-b text-sm">
-                              <select
-                                value={order.status}
-                                onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                                className={`form-select appearance-none block w-full px-3 py-1.5 text-base font-normal bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none ${statusColors[order.status] || 'text-gray-700'}`}
-                              >
-                                <option value="diproses">Diproses</option>
-                                <option value="dikirim">Dikirim</option>
-                                <option value="selesai">Selesai</option>
-                                <option value="dibatalkan">Dibatalkan</option>
-                              </select>
+                              <div className="relative">
+                                <select
+                                  value={order.status}
+                                  onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                                  className={`appearance-none block w-full pl-3 pr-8 py-1.5 text-base font-normal bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none ${statusColors[order.status] || 'text-gray-700'}`}
+                                >
+                                  <option value="diproses">Diproses</option>
+                                  <option value="dikirim">Dikirim</option>
+                                  <option value="selesai">Selesai</option>
+                                  <option value="dibatalkan">Dibatalkan</option>
+                                </select>
+                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                                  </svg>
+                                </div>
+                              </div>
                             </td>
                           </tr>
                         ))}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../App';
+import toast from 'react-hot-toast';
 import EyeIcon from '../assets/icons/EyeIcon';
 import EyeOffIcon from '../assets/icons/EyeOffIcon';
 
@@ -9,28 +10,48 @@ const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState(null);
-  const [successMessage, setSuccessMessage] = useState('');
-
-
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
 
 
   useEffect(() => {
-    if (location.state?.email) {
-      setEmail(location.state.email);
-      setSuccessMessage(location.state.message);
-    }
-  }, [location.state]);
+      if (location.state?.message) {
+        toast.success(location.state.message);
+        navigate(location.pathname, { replace: true, state: {} });
+      }
+      if (location.state?.email) {
+        setEmail(location.state.email);
+      }
+    }, [location.state, navigate]);
 
+
+  const validateForm = () => {
+    if (!email) {
+      toast.error('Email tidak boleh kosong');
+      return false;
+    }
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      toast.error('Format email tidak valid');
+      return false;
+    }
+    if (!password) {
+      toast.error('Password tidak boleh kosong');
+      return false;
+    }
+    if (password.length < 8) {
+      toast.error('Password minimal 8 karakter');
+      return false;
+    }
+    return true;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
-    setSuccessMessage('');
 
+    if (!validateForm()) {
+      return; 
+    }
 
     try {
       const response = await fetch('http://localhost:8000/api/login', {
@@ -43,17 +64,14 @@ const LoginPage = () => {
         body: JSON.stringify({ email, password }),
       });
 
-
       const data = await response.json();
-
 
       if (!response.ok) {
         throw new Error(data.message || 'Login gagal! Periksa email/password.');
       }
 
-
+      toast.success('Login berhasil!');
       login(data.user);
-
 
       if (data.user.role === 'admin') {
         navigate('/admin');
@@ -61,19 +79,15 @@ const LoginPage = () => {
         navigate('/');
       }
 
-
     } catch (err) {
-      setError(err.message);
+      toast.error(err.message);
     }
   };
-
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
         <h2 className="text-2xl font-bold text-center text-gray-900">Login ke Akun Anda</h2>
-        {error && <p className="text-red-500 text-sm text-center bg-red-100 p-2 rounded">{error}</p>}
-        {successMessage && <p className="text-green-600 text-sm text-center bg-green-100 p-2 rounded">{successMessage}</p>}
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
@@ -109,16 +123,12 @@ const LoginPage = () => {
               <button
                 type="button"
                 className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500"
-                onMouseDown={() => setShowPassword(true)}
-                onMouseUp={() => setShowPassword(false)}
-                onMouseLeave={() => setShowPassword(false)}
+                onClick={() => setShowPassword(!showPassword)}
               >
-                {/* Ikon ditukar */}
                 {showPassword ? <EyeIcon /> : <EyeOffIcon />}
               </button>
             </div>
           </div>
-
 
           <button
             type="submit"
@@ -137,6 +147,5 @@ const LoginPage = () => {
     </div>
   );
 };
-
 
 export default LoginPage;
